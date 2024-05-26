@@ -68,5 +68,4 @@ CREATE TABLE IF NOT EXISTS payments
     FOREIGN KEY (order_uid) 
         REFERENCES orders (order_uid)
 );
-
 END;
