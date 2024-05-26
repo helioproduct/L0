@@ -8,3 +8,10 @@ services:
             - ./postgres/initdb:/docker-entrypoint-initdb.d
         ports:
             - "5432:5432"
+    
+    nats-streaming:
+        image: nats-streaming:0.25
+        command: -p 4222 -m 8223
+        ports:
+            - "4222:4222"
+            - "8223:8223"
