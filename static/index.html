@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .main {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 60px;
+            /* Added margin to avoid overlapping header */
+        }
+
+        .main__item {
+            background: #1e1e1e;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .list {
+            width: 20vw;
+            min-height: 90vh;
+            order: 1;
+        }
+
+        .content {
+            width: 60vw;
+            order: 0;
+        }
+
+        button {
+            background-color: #bb86fc;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 14px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #9b5de5;
+        }
+
+        #uids-list button {
+            display: block;
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        #order-content {
+            background: #333;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #e0e0e0;
+        }
+
+        .error {
+            color: #cf6679;
+            font-size: 14px;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            border: 1px solid #333;
+            background: #222;
+            color: #e0e0e0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header" id="order-count"></div>
+    <div class="main">
+        <div class="main__item content">
+            <input id="uid-input" type="text" placeholder="Введите UID заказа">
+            <button onclick="updateContent(document.getElementById('uid-input').value)">Найти</button>
+            <pre id="order-content"></pre>
+        </div>
+        <div class="main__item list">
+            <button onclick="updateList()">Обновить список uids в кэше</button>
+            <div id="uids-list"></div>
+            <div id="error-message" class="error"></div>
+        </div>
+    </div>
+
+    <script>
+        async function updateList() {
+            try {
+                const response = await fetch('/api/v1/orders', { method: 'GET' });
+                if (!response.ok) {
+                    throw new Error(`Error! status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                console.log(data);
+                const uidsList = document.getElementById('uids-list');
+                uidsList.innerHTML = '';
+                for (const orderUid of data) {
+                    var btn = document.createElement("button");
+                    btn.onclick = function () { updateContent(orderUid); };
+                    btn.innerHTML = orderUid;
+                    uidsList.appendChild(btn);
+                }
+                document.getElementById('order-count').innerText = `Количество заказов: ${data.length}`;
+                document.getElementById('error-message').innerText = '';
+            } catch (error) {
+                console.log(error);
+                document.getElementById('error-message').innerText = error.message;
+            }
+        }
+
+        async function updateContent(uid) {
+            try {
+                const response = await fetch('/api/v1/orders/' + uid, { method: 'GET' });
+                if (!response.ok) {
+                    throw new Error(`Error! status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                console.log(data);
+                const preElement = document.getElementById('order-content');
+                preElement.style.fontSize = '14px';
+                preElement.innerHTML = JSON.stringify(data, null, 2);
+                document.getElementById('error-message').innerText = '';
+            } catch (error) {
+                console.log(error);
+                document.getElementById('error-message').innerText = error.message;
+            }
+        }
+
+        updateList();
+    </script>
+</body>
+
+</html>
