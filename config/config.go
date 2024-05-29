@@ -3,9 +3,9 @@ package config
 import "github.com/kelseyhightower/envconfig"
 
 type DBConfig struct {
-	DBname string `envconfig:"POSTGRES_DB" default:"servicedb"`
-	User   string `envconfig:"POSTGRES_SERVICE_USER" default:"serviceuser"`
-	Pass   string `envconfig:"POSTGRES_SERVICE_PASSWORD" default:"servicepassword"`
+	DBname string `envconfig:"POSTGRES_DB" default:"postgres"`
+	User   string `envconfig:"POSTGRES_SERVICE_USER" default:"postgres"`
+	Pass   string `envconfig:"POSTGRES_SERVICE_PASSWORD" default:"superpassword"`
 	Host   string `envconfig:"POSTGRES_HOST" default:"127.0.0.1"`
 	Port   string `envconfig:"POSTGRES_PORT" default:"5432"`
 }
@@ -29,6 +29,5 @@ type Config struct {
 func GetConfig() (*Config, error) {
 	var cfg Config
 	err := envconfig.Process("", &cfg)
-
 	return &cfg, err
 }
