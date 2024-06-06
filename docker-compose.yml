@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
     postgres:
         image: postgres:15.3
@@ -8,10 +10,26 @@ services:
             - ./postgres/initdb:/docker-entrypoint-initdb.d
         ports:
             - "5432:5432"
-    
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U postgres"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
     nats-streaming:
         image: nats-streaming:0.25
         command: -p 4222 -m 8223
         ports:
             - "4222:4222"
             - "8223:8223"
+
+    service:
+        build: ./cmd/
+        restart: always
+        ports:
+            - "8080:8080"
+        depends_on:
+            postgres:
+                condition: service_healthy
+            nats-streaming:
+                condition: service_started
