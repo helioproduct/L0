@@ -49,7 +49,7 @@ func MakeHandler(orderModel models.OrderModel) http.Handler {
 	}
 	router := httprouter.New()
 	router.ServeFiles("/dashboard/*filepath", http.Dir("static"))
-	router.GET("/api/v1/orders", handlers.orders)
-	router.GET("/api/v1/orders/:uid", handlers.ordersUid)
+	router.GET("/orders", handlers.orders)
+	router.GET("/orders/:uid", handlers.ordersUid)
 	return router
 }
